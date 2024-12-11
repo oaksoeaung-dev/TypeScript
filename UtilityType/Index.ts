@@ -1,48 +1,110 @@
+interface Assignment {
+    studentId: string,
+    title: string,
+    grade: number,
+    verified?: boolean
+}
+
+const updateAssignment = (assignment: Assignment, propsToUpdate: Partial<Assignment>): Assignment => {
+    return {...assignment, ...propsToUpdate};
+}
+
+const assignment1: Assignment = {
+    studentId: "STD-1000",
+    title: "Final project",
+    grade: 0,
+}
+
+console.log(updateAssignment(assignment1, {grade: 9}));
+
 type Phone = {
-    id: number,
     brand: string,
-    storage: "512GB" | "256GB" | "128GB"
+    ram: string,
+    storage: string,
 }
 
-const phones: Phone[] = [
-    {id: 1, brand: "IPhone 16", storage: "512GB"},
-    {id: 2, brand: "Xiaomi Civi 4", storage: "512GB"},
-    {id: 3, brand: "Samsung S24", storage: "128GB"},
-];
+// type UpdatePhone = {
+//     brand?: string,
+//     ram?: string,
+//     storage?: string,
+// }
 
-let nextPhoneId = 1;
+type UpdatePhone = Partial<Phone>;
 
-type UpdatePhone = Partial<Phone>; // Partial automatically add optional property id?, brand?
+type car = string;
 
-function updatePhone(id: number, update:UpdatePhone)
-{
-    const phone = phones.find(phone => phone.id === id);
+type Students = "Mg Mg" | "Su Su";
+type LetterGrades = "A" | "B" | "C" | "D";
 
-    if(!phone)
-    {
-        console.error("Phone not found");
-        return;
-    }
-
-    Object.assign(phone, update);
-
+const finalGrades: Record<Students, LetterGrades> = {
+    "Mg Mg": "A",
+    "Su Su": "B",
+    // "Mg Mg": "C", //error
+    // "Lu Lu" : "A" //error
 }
 
-function addNewPhone(newPhone: Omit<Phone, "id" | "phone">): Phone // Omit က သတ်မှတ်ထားတာတွေကိုပေးမထည့်ဘူး id သတ်မှတ်ထားရင်  id ထည့်စရာမလိုဘူး
-{
-    const phone: Phone = {
-        id: nextPhoneId++,
-        ...newPhone
-    }
-
-    phones.push(phone);
-    return phone;
+type Grades = {
+    assign1: number,
+    assign2: number,
 }
 
-updatePhone(1, {brand: "IPhone 16 Pro"});
-updatePhone(2,{brand: "Xiaomi Redmi Note 14 Pro", storage: "256GB"});
+const gradeData: Record<Students, Grades> = {
+    "Mg Mg": {assign1: 98, assign2: 100},
+    "Su Su": {assign1: 59, assign2: 40}
+}
 
-//addNewPhone({id: 3, brand: "Huawei P70", storage: "256GB"}); // Error because of Omit
-addNewPhone({brand: "Huawei P70", storage: "256GB"});
+type AssignResult = Pick<Assignment, "studentId" | "grade">;
 
-console.log(phones);
+const score: AssignResult = {
+    studentId: "STD-3000",
+    grade: 100,
+}
+
+type AssignPreview = Omit<Assignment, "grade" | "verified">;
+
+const preview: AssignPreview = {
+    studentId: "STD-4000",
+    title: "Final project",
+}
+
+type adjustGrade = Exclude<LetterGrades, "A">;
+
+type highGrade = Extract<LetterGrades, "A">;
+
+type AllPossibleGrade = "Oak" | "Soe" | null | undefined
+
+type NamesOnly = NonNullable<AllPossibleGrade>;
+
+const createNewAssign = (title:string, points: number) => {
+    return {title, points};
+}
+
+type newAssign = ReturnType<typeof createNewAssign>; // function ရဲ့ return type ကို type အနေနဲ့ယူတာ
+
+type AssignParams = Parameters<typeof createNewAssign>;
+
+const assignArgs: AssignParams = ["Hello", 400];
+
+const assignArgs2: newAssign = createNewAssign(...assignArgs);
+
+// Promise
+
+interface UserFetch {
+    id: number,
+    name: string,
+    username: string,
+    email: string,
+}
+
+const fetchUsers = async(): Promise<UserFetch[]> => {
+    const data = await fetch("https://jsonplaceholder.typicode.com/users") //fetch က promise return ပြန်လို့ await နဲ့စောင့်
+                        .then(resopse => resopse.json()).catch(error => {
+                            if(error instanceof Error)
+                                console.log(error.message);
+                        })
+    return data;
+}
+
+type FetchUserReturnType = Awaited<ReturnType<typeof fetchUsers>> //fetchUsers က promise return ပြန်လို့စောင့်ပေးရတယ် Awaited နဲ့
+
+fetchUsers().then(users => console.log(users));
